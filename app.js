@@ -39,7 +39,7 @@
     damageReduction: document.getElementById('damage-reduction'),
     weaponDamage:   document.getElementById('weapon-damage'),
     skillDamage:    document.getElementById('skill-damage'),
-    critChance:     document.getElementById('crit-chance'),
+
     strength:       document.getElementById('strength'),
     intelligence:   document.getElementById('intelligence'),
     willpower:      document.getElementById('willpower'),
@@ -219,7 +219,7 @@
     { label: 'Desecration: 20%', value: 20 },
     { label: 'Dominate: 12%', value: 12 },
     { label: 'Eliminator: 10%', value: 10 },
-    { label: 'Essence: 22%', value: 22 },
+    { label: 'Essence: 17.6%', value: 17.6 },
     { label: 'Exhumation: 0%', value: 0 },
     { label: 'Exploit: 10%', value: 10 },
     { label: 'Golem: 25%', value: 25 },
@@ -973,12 +973,17 @@
           } else {
             const glyphInfo = classData.legBonuses.find(g => g.label === glyphName);
             if (glyphInfo) {
-              let bonus = glyphInfo.min + ((glyphInfo.max - glyphInfo.min) * ((level - 1) / 149));
+              let rawBonus = glyphInfo.min + ((glyphInfo.max - glyphInfo.min) * ((level - 1) / 149));
+              let finalBonus = rawBonus;
+              let isEffective = false;
               if (glyphName === 'Essence') {
-                bonus = bonus * 0.8; // Active 80% of the time (not healthy condition)
+                finalBonus = rawBonus * 0.8; // Active 80% of the time (not healthy condition)
+                isEffective = true;
               }
-              vals.push(bonus);
-              if (disp) disp.textContent = bonus.toFixed(1) + '%';
+              vals.push(finalBonus);
+              if (disp) {
+                disp.textContent = finalBonus.toFixed(1) + '%' + (isEffective ? ' (Effective)' : '');
+              }
             } else {
               vals.push(0);
               if (disp) disp.textContent = '0.0%';
@@ -1325,7 +1330,7 @@
     // Store current values in state
     currentBuild.weaponDamage = weaponDmg;
     currentBuild.skillDamage = skillPct;
-    currentBuild.critChance = dom.critChance ? parseFloat(dom.critChance.value) || 0 : 0;
+
     currentBuild.strength = str;
     currentBuild.intelligence = intel;
     currentBuild.willpower = will;
@@ -1532,7 +1537,7 @@
     if (dom.classSelect) dom.classSelect.value = b.class || 'Barbarian';
     dom.weaponDamage.value = b.weaponDamage || 0;
     dom.skillDamage.value = b.skillDamage || 0;
-    if (dom.critChance) dom.critChance.value = b.critChance || 0;
+
     dom.strength.value = b.strength || 0;
     dom.intelligence.value = b.intelligence || 0;
     dom.willpower.value = b.willpower || 0;
@@ -1882,7 +1887,7 @@
   // ---- Event Binding ----
   function init() {
     // Base stat inputs → recalculate
-    [dom.weaponDamage, dom.skillDamage, dom.critChance, dom.strength, dom.intelligence, dom.willpower, dom.dexterity, dom.level, dom.toughness, dom.armor, dom.physRes, dom.fireRes, dom.lightningRes, dom.coldRes, dom.poisonRes, dom.shadowRes, dom.maxLife, dom.potionCapacity, dom.healingReceived, dom.lifePer5s, dom.summonArmor, dom.damageReductionAll, dom.barrierBonus, dom.dodgeChance, dom.maxEssence, dom.essenceRegen, dom.movementSpeed, dom.luckyHit, dom.ccDuration, dom.expBonus, dom.damageReduction, dom.aps, dom.buildName].filter(Boolean).forEach(el => {
+    [dom.weaponDamage, dom.skillDamage, dom.strength, dom.intelligence, dom.willpower, dom.dexterity, dom.level, dom.toughness, dom.armor, dom.physRes, dom.fireRes, dom.lightningRes, dom.coldRes, dom.poisonRes, dom.shadowRes, dom.maxLife, dom.potionCapacity, dom.healingReceived, dom.lifePer5s, dom.summonArmor, dom.damageReductionAll, dom.barrierBonus, dom.dodgeChance, dom.maxEssence, dom.essenceRegen, dom.movementSpeed, dom.luckyHit, dom.ccDuration, dom.expBonus, dom.damageReduction, dom.aps, dom.buildName].filter(Boolean).forEach(el => {
       el.addEventListener('input', calculate);
       if (el.tagName === 'SELECT') {
         el.addEventListener('change', calculate);
